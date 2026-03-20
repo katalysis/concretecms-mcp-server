@@ -1,0 +1,17 @@
+{
+  "servers": {
+    "concretecms": {
+      "command": "node",
+      "args": [
+        "/Users/YOUR_USERNAME/.mcp/concretecms-mcp-server/dist/index.js"
+      ],
+      "env": {
+        "CONCRETE_CANONICAL_URL": "https://your-site.example.com",
+        "CONCRETE_API_CLIENT_ID": "YOUR_CLIENT_ID",
+        "CONCRETE_API_CLIENT_SECRET": "YOUR_CLIENT_SECRET",
+        "CONCRETE_API_SCOPE": "account:read system:info:read pages:read pages:add pages:update pages:delete pages:versions:read pages:versions:update pages:versions:delete pages:areas:add_block pages:areas:update_block pages:areas:delete_block files:read files:add files:update files:delete users:read users:add users:update users:delete sites:read blocks:read blocks:update blocks:delete",
+        "CONCRETE_TOKEN_PATH": "/Users/YOUR_USERNAME/.mcp/tokens/your-site.json"
+      }
+    }
+  }
+}

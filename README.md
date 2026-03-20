@@ -23,10 +23,10 @@ cd concretecms-mcp-server
 npm install && npm run build
 ```
 
-Then in your project, copy the example config and fill in your credentials:
+Then create a `.vscode/mcp.json` in your project using the example from this repo as a template:
 
 ```bash
-cp .vscode/mcp.json.example .vscode/mcp.json
+cp ~/.mcp/concretecms-mcp-server/mcp.json.example /path/to/your-project/.vscode/mcp.json
 ```
 
 Edit `.vscode/mcp.json` with your site URL, API Client ID, Client Secret, and your local username in the paths. The file is gitignored so your credentials will never be committed.
