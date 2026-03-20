@@ -2,6 +2,104 @@
 
 A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for [Concrete CMS](https://www.concretecms.org) built with TypeScript.
 
+---
+
+## Katalysis Setup Guide
+
+This is the [Katalysis](https://www.katalysis.net) fork of the upstream MCP server. It adds:
+
+- **HTTP Basic Auth support** — for password-protected dev sites (`CONCRETE_BASIC_AUTH_USER` / `CONCRETE_BASIC_AUTH_PASS`)
+- **Configurable token storage** — via `CONCRETE_TOKEN_PATH`, enabling multiple sites to share a single install without token conflicts
+
+### New Team Member Setup
+
+Install the MCP server once globally on your machine — it is shared across all projects, not cloned per site.
+
+```bash
+mkdir -p ~/.mcp/tokens
+cd ~/.mcp
+git clone https://github.com/katalysis/concretecms-mcp-server
+cd concretecms-mcp-server
+npm install && npm run build
+```
+
+Then in your project, copy the example config and fill in your credentials:
+
+```bash
+cp .vscode/mcp.json.example .vscode/mcp.json
+```
+
+Edit `.vscode/mcp.json` with your site URL, API Client ID, Client Secret, and your local username in the paths. The file is gitignored so your credentials will never be committed.
+
+### Setting Up API Credentials in Concrete CMS
+
+1. Go to **Dashboard > System > API > Settings** and enable the API
+2. Go to **Dashboard > System > API > Integrations** and create a new integration
+3. Set the redirect URI to `http://localhost:3000/callback`
+4. Note the Client ID and Client Secret — add these to your `.vscode/mcp.json`
+
+### Recommended Scope List
+
+The following scopes are known to work. Note: **do not include `openid`** — it causes a JWT claim error.
+
+```
+account:read system:info:read pages:read pages:add pages:update pages:delete pages:versions:read pages:versions:update pages:versions:delete pages:areas:add_block pages:areas:update_block pages:areas:delete_block files:read files:add files:update files:delete users:read users:add users:update users:delete sites:read blocks:read blocks:update blocks:delete
+```
+
+### Using with VS Code / GitHub Copilot
+
+The `.vscode/mcp.json` file configures the MCP server for VS Code and GitHub Copilot. Once filled in, VS Code will automatically connect to your Concrete CMS site and make MCP tools available in Copilot chat.
+
+### Using with Claude Desktop
+
+Add an entry to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS):
+
+```json
+{
+  "mcpServers": {
+    "concretecms-dev35": {
+      "command": "node",
+      "args": ["/Users/YOUR_USERNAME/.mcp/concretecms-mcp-server/dist/index.js"],
+      "env": {
+        "CONCRETE_CANONICAL_URL": "https://your-dev-site.example.com",
+        "CONCRETE_API_CLIENT_ID": "YOUR_CLIENT_ID",
+        "CONCRETE_API_CLIENT_SECRET": "YOUR_CLIENT_SECRET",
+        "CONCRETE_API_SCOPE": "account:read system:info:read pages:read ...",
+        "CONCRETE_TOKEN_PATH": "/Users/YOUR_USERNAME/.mcp/tokens/your-dev-site.json"
+      }
+    }
+  }
+}
+```
+
+You can add multiple entries (one per site) by giving each a unique key (e.g. `concretecms-dev35`, `concretecms-live`). Each site gets its own token file via `CONCRETE_TOKEN_PATH`.
+
+After restarting Claude Desktop, a browser window will open for OAuth authorisation. Once approved, tokens are saved to the path specified and you won't need to authorise again.
+
+### Password-Protected Dev Sites
+
+> ⚠️ **Work in progress** — Basic Auth support has been implemented but not yet fully tested end-to-end. Use with caution.
+
+If your dev site is behind HTTP Basic Auth, add these to your config:
+
+```json
+"CONCRETE_BASIC_AUTH_USER": "your_username",
+"CONCRETE_BASIC_AUTH_PASS": "your_password"
+```
+
+These are supported in both `.vscode/mcp.json` and Claude Desktop config. The simplest workaround in the meantime is to temporarily disable password protection while completing the initial OAuth flow, then re-enable it.
+
+### Pulling Upstream Updates
+
+```bash
+cd ~/.mcp/concretecms-mcp-server
+git fetch upstream
+git merge upstream/main
+npm install && npm run build
+```
+
+---
+
 ## Installation
 
 ```bash
