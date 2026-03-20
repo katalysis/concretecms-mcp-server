@@ -8,8 +8,8 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for [C
 
 This is the [Katalysis](https://www.katalysis.net) fork of the upstream MCP server. It adds:
 
-- **HTTP Basic Auth support** — for password-protected dev sites (`CONCRETE_BASIC_AUTH_USER` / `CONCRETE_BASIC_AUTH_PASS`)
 - **Configurable token storage** — via `CONCRETE_TOKEN_PATH`, enabling multiple sites to share a single install without token conflicts
+- **Node.js crypto compatibility fix** — ensures the server works correctly across Node.js versions
 
 ### New Team Member Setup
 
@@ -65,9 +65,7 @@ Add an entry to `~/Library/Application Support/Claude/claude_desktop_config.json
         "CONCRETE_API_CLIENT_ID": "YOUR_CLIENT_ID",
         "CONCRETE_API_CLIENT_SECRET": "YOUR_CLIENT_SECRET",
         "CONCRETE_API_SCOPE": "account:read system:info:read pages:read ...",
-        "CONCRETE_TOKEN_PATH": "/Users/YOUR_USERNAME/.mcp/tokens/your-dev-site.json",
-        "CONCRETE_BASIC_AUTH_USER": "",
-        "CONCRETE_BASIC_AUTH_PASS": ""
+        "CONCRETE_TOKEN_PATH": "/Users/YOUR_USERNAME/.mcp/tokens/your-dev-site.json"
       }
     }
   }
@@ -80,16 +78,29 @@ After restarting Claude Desktop, a browser window will open for OAuth authorisat
 
 ### Password-Protected Dev Sites
 
-> ⚠️ **Work in progress** — Basic Auth support has been implemented but not yet fully tested end-to-end. Use with caution.
+HTTP Basic Auth at the server level blocks the OAuth flow, so Plesk's built-in "Password Protected Directories" tool cannot be used with this MCP server. Instead, use `.htaccess` IP-based access control directly.
 
-If your dev site is behind HTTP Basic Auth, add these to your config:
+This approach lets you whitelist specific IPs while requiring a password for everyone else — or simply deny all non-whitelisted IPs entirely:
 
-```json
-"CONCRETE_BASIC_AUTH_USER": "your_username",
-"CONCRETE_BASIC_AUTH_PASS": "your_password"
+```apache
+# IP-based access control for dev sites
+AuthType Basic
+AuthName "Restricted Access"
+AuthUserFile /path/to/your/.htpasswd
+
+<RequireAny>
+    # Allow whitelisted IPs without a password
+    Require ip 123.123.123.123
+    Require ip 456.456.456.456
+
+    # Require password for everyone else
+    Require valid-user
+</RequireAny>
 ```
 
-These are supported in both `.vscode/mcp.json` and Claude Desktop config. The simplest workaround in the meantime is to temporarily disable password protection while completing the initial OAuth flow, then re-enable it.
+To add more team members, either add their IP to the whitelist or give them credentials in the `.htpasswd` file — both can coexist in the same `<RequireAny>` block.
+
+> **Note:** Configure this in `.htaccess` rather than via Plesk's Password Protected Directories tool. Plesk's tool sets protection at the nginx level which intercepts requests before Apache and cannot be selectively bypassed per path or IP in the same way.
 
 ### Pulling Upstream Updates
 
