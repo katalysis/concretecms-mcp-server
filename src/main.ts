@@ -1,3 +1,4 @@
+import './auth/customClient.js' // Must be imported first to override fetch
 import { RefreshTokenGrantProvider } from './auth/RefreshTokenGrantProvider.js'
 import { performOAuthFlow } from './auth/oauthFlow.js'
 import { startMcpServer } from './server/mcp.js'

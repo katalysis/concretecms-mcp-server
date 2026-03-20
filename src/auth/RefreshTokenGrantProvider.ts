@@ -1,6 +1,7 @@
 import * as client from 'openid-client'
 import { config } from './oidc.js'
 import { loadTokens, saveTokens, type StoredTokens } from '../tokenStore.js'
+import { basic_auth_user, basic_auth_pass } from '../env.js'
 
 export class RefreshTokenGrantProvider {
   private _accessToken: string | undefined
@@ -37,9 +38,17 @@ export class RefreshTokenGrantProvider {
       await this.refreshAccessToken()
     }
 
-    return {
+    const headers: Record<string, string> = {
       Authorization: `Bearer ${this._accessToken}`,
     }
+
+    // Add HTTP Basic Auth if credentials are provided (for password-protected dev sites)
+    if (basic_auth_user && basic_auth_pass) {
+      const basicAuth = Buffer.from(`${basic_auth_user}:${basic_auth_pass}`).toString('base64')
+      headers['X-Basic-Authorization'] = `Basic ${basicAuth}`
+    }
+
+    return headers
   }
 
   async handleAuthError(error: any): Promise<boolean> {
