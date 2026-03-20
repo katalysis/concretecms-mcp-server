@@ -98,7 +98,7 @@ AuthUserFile /path/to/your/.htpasswd
 </RequireAny>
 ```
 
-To add more team members, either add their IP to the whitelist or give them credentials in the `.htpasswd` file — both can coexist in the same `<RequireAny>` block.
+To add a new team member, add their IP address to the whitelist. IP whitelisting is required for MCP access — `.htpasswd` credentials alone will not work because the OAuth flow is blocked by the Basic Auth challenge regardless of whether the user has valid credentials.
 
 > **Note:** Configure this in `.htaccess` rather than via Plesk's Password Protected Directories tool. Plesk's tool sets protection at the nginx level which intercepts requests before Apache and cannot be selectively bypassed per path or IP in the same way.
 
