@@ -65,7 +65,9 @@ Add an entry to `~/Library/Application Support/Claude/claude_desktop_config.json
         "CONCRETE_API_CLIENT_ID": "YOUR_CLIENT_ID",
         "CONCRETE_API_CLIENT_SECRET": "YOUR_CLIENT_SECRET",
         "CONCRETE_API_SCOPE": "account:read system:info:read pages:read ...",
-        "CONCRETE_TOKEN_PATH": "/Users/YOUR_USERNAME/.mcp/tokens/your-dev-site.json"
+        "CONCRETE_TOKEN_PATH": "/Users/YOUR_USERNAME/.mcp/tokens/your-dev-site.json",
+        "CONCRETE_BASIC_AUTH_USER": "",
+        "CONCRETE_BASIC_AUTH_PASS": ""
       }
     }
   }
